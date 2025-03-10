@@ -30,7 +30,7 @@ const port = process.env.PORT || 5000;
 
 // CORS configuration for Netlify frontend
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://cryptostreamweb3.netlify.app'], // Allow local dev and Netlify
+  origin: ['http://localhost:5173', 'https://cryptostreamweb3.netlify.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type']
 }));
@@ -41,7 +41,7 @@ let creators = [
   { name: 'Samay Raina', followers: '56k', username: 'samayraina', image: 'https://i.ibb.co/mFCxdzkF/samay.jpg' },
 ];
 
-// In-memory storage for user points (replace with a database in production)
+// In-memory storage for user points
 const userPoints = {};
 
 (async () => {
@@ -58,29 +58,24 @@ const userPoints = {};
     fs = unixfs(helia);
     console.log('✅ Helia node initialized with persistent storage');
 
-    // Validate Hive Posting Key
     if (!process.env.HIVE_POSTING_KEY) {
       throw new Error('❌ HIVE_POSTING_KEY is missing in .env file');
     }
     console.log('🔑 Hive Posting Key loaded');
 
-    // Initialize Hive, WebTorrent, and Key
     client = new dhive.Client('https://api.hive.blog');
     torrentClient = new WebTorrent();
     hiveKey = dhive.PrivateKey.fromString(process.env.HIVE_POSTING_KEY);
 
-    // Middleware
     app.use(express.json());
     app.use(express.static('public'));
     app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
-    // Multer for file uploads
     const upload = multer({
       storage: multer.memoryStorage(),
-      limits: { fileSize: 100 * 1024 * 1024 }, // 100MB max
+      limits: { fileSize: 100 * 1024 * 1024 },
     });
 
-    // 🔹 **Upload Video API**
     app.post('/api/upload', upload.single('video'), async (req, res) => {
       const { filename, username, category = 'video', premium = 'false' } = req.body;
       const videoBuffer = req.file?.buffer;
@@ -144,7 +139,6 @@ const userPoints = {};
       }
     });
 
-    // 🔹 **Fetch Videos API**
     app.get('/api/videos', async (req, res) => {
       const { tag = 'video', limit = 20, premium = 'false' } = req.query;
       try {
@@ -179,12 +173,10 @@ const userPoints = {};
       }
     });
 
-    // 🔹 **Fetch Creators API**
     app.get('/api/creators', (req, res) => {
       res.json(creators);
     });
 
-    // 🔹 **Update Creator API**
     app.put('/api/creators/:username', (req, res) => {
       const { username } = req.params;
       const { name, followers, image } = req.body;
@@ -192,14 +184,12 @@ const userPoints = {};
       res.json({ message: '✅ Creator updated' });
     });
 
-    // 🔹 **Delete Creator API**
     app.delete('/api/creators/:username', (req, res) => {
       const { username } = req.params;
       creators = creators.filter((c) => c.username !== username);
       res.json({ message: '✅ Creator deleted' });
     });
 
-    // 🔹 **Fetch Comments API**
     app.get('/api/comments/:author/:permlink', async (req, res) => {
       const { author, permlink } = req.params;
       try {
@@ -218,7 +208,6 @@ const userPoints = {};
       }
     });
 
-    // 🔹 **Reward Points API**
     app.post('/api/reward-points', async (req, res) => {
       const { username, activity } = req.body;
       if (!username || !activity) {
@@ -226,7 +215,6 @@ const userPoints = {};
       }
 
       try {
-        // Simple points system (replace with database in production)
         const points = activity === 'comment' ? 10 : 0;
         userPoints[username] = (userPoints[username] || 0) + points;
         console.log(`Awarded ${points} points to ${username} for ${activity}`);
@@ -238,8 +226,7 @@ const userPoints = {};
       }
     });
 
-    // Start Server
-    app.listen(port, () => console.log(`🚀 CryptoStream Server running at http://localhost:${port}`));
+    app.listen(port, () => console.log(`🚀 CryptoStream Server running on port ${port}`));
   } catch (error) {
     console.error('❌ Server initialization failed:', error);
     process.exit(1);
