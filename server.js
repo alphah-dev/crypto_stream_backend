@@ -28,11 +28,21 @@ config({ path: path.join(rootDir, '.env') });
 const app = express();
 const port = process.env.PORT || 5000;
 
+// CORS configuration for Netlify frontend
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://cryptostreamweb3.netlify.app'], // Allow local dev and Netlify
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type']
+}));
+
 // Dummy in-memory storage for creators
 let creators = [
   { name: 'Harsh Katiyar', followers: '80k', username: 'harshkatiyar', image: 'https://i.ibb.co/SwVNJK5r/12.jpg' },
   { name: 'Samay Raina', followers: '56k', username: 'samayraina', image: 'https://i.ibb.co/mFCxdzkF/samay.jpg' },
 ];
+
+// In-memory storage for user points (replace with a database in production)
+const userPoints = {};
 
 (async () => {
   let helia;
@@ -62,9 +72,6 @@ let creators = [
     // Middleware
     app.use(express.json());
     app.use(express.static('public'));
-    app.use(cors());
-
-    // Serve uploaded images
     app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
     // Multer for file uploads
@@ -190,6 +197,45 @@ let creators = [
       const { username } = req.params;
       creators = creators.filter((c) => c.username !== username);
       res.json({ message: '✅ Creator deleted' });
+    });
+
+    // 🔹 **Fetch Comments API**
+    app.get('/api/comments/:author/:permlink', async (req, res) => {
+      const { author, permlink } = req.params;
+      try {
+        const comments = await client.database.getContentReplies({ author, permlink });
+        res.json(
+          comments.map((c) => ({
+            author: c.author,
+            permlink: c.permlink,
+            body: c.body,
+            created: c.created,
+          }))
+        );
+      } catch (error) {
+        console.error('❌ Comments fetch error:', error);
+        res.status(500).json({ error: 'Failed to fetch comments: ' + error.message });
+      }
+    });
+
+    // 🔹 **Reward Points API**
+    app.post('/api/reward-points', async (req, res) => {
+      const { username, activity } = req.body;
+      if (!username || !activity) {
+        return res.status(400).json({ error: 'Missing username or activity' });
+      }
+
+      try {
+        // Simple points system (replace with database in production)
+        const points = activity === 'comment' ? 10 : 0;
+        userPoints[username] = (userPoints[username] || 0) + points;
+        console.log(`Awarded ${points} points to ${username} for ${activity}`);
+
+        res.json({ message: `Awarded ${points} points for ${activity}! Total points: ${userPoints[username]}` });
+      } catch (error) {
+        console.error('❌ Reward points error:', error);
+        res.status(500).json({ error: 'Failed to award points: ' + error.message });
+      }
     });
 
     // Start Server
