@@ -187,7 +187,7 @@ import { config } from 'dotenv';
 import express from 'express';
 import { createHelia } from 'helia';
 import { unixfs } from '@helia/unixfs';
-import DatastoreFS from 'datastore-fs';
+import { DatastoreFS } from 'datastore-fs';
 const FsDatastore = DatastoreFS;
 import dhive from '@hiveio/dhive';
 import WebTorrent from 'webtorrent';
