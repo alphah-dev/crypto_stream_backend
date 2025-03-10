@@ -187,8 +187,13 @@ import { config } from 'dotenv';
 import express from 'express';
 import { createHelia } from 'helia';
 import { unixfs } from '@helia/unixfs';
-import DatastoreFS from 'datastore-fs'; 
-const FsDatastore = new DatastoreFS();
+import('datastore-fs').then((DatastoreFS) => {
+  const FsDatastore = new DatastoreFS.default(); // ✅ Correct way to access default export
+  console.log("DatastoreFS initialized successfully");
+}).catch((error) => {
+  console.error("Error importing datastore-fs:", error);
+});
+
 import dhive from '@hiveio/dhive';
 import WebTorrent from 'webtorrent';
 import multer from 'multer';
