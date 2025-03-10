@@ -1,0 +1,25 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "harsh katiyar katiyarh76@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "@helia/unixfs": "^4.0.2",
+    "@hiveio/dhive": "^1.3.2",
+    "cors": "^2.8.5",
+    "datastore-fs": "^10.0.2",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helia": "^5.2.1",
+    "multer": "^1.4.5-lts.1",
+    "webtorrent": "^2.5.19"
+  },
+  "devDependencies": {},
+  "description": ""
+}
