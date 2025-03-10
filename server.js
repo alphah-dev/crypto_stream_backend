@@ -32,7 +32,8 @@ const port = process.env.PORT || 5000;
 app.use(cors({
   origin: ['http://localhost:5173', 'https://cryptostreamweb3.netlify.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type']
+  allowedHeaders: ['Content-Type', 'Content-Length'],
+  credentials: true
 }));
 
 // Dummy in-memory storage for creators
