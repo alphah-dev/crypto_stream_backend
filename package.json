@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
+    "dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "cd node_modules/@ipshipyard/node-datachannel && npm rebuild"
+    "postinstall": "npm rebuild @ipshipyard/node-datachannel"
   },
-  "keywords": [],
-  "author": "harsh katiyar katiyarh76@gmail.com",
-  "license": "ISC",
+  "engines": {
+    "node": "18.x"
+  },
   "dependencies": {
     "@helia/unixfs": "^4.0.2",
     "@hiveio/dhive": "^1.3.2",
@@ -22,5 +23,10 @@
     "multer": "^1.4.5-lts.1",
     "webtorrent": "^2.5.19"
   },
-  "description": ""
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "author": "Harsh Katiyar <katiyarh76@gmail.com>",
+  "license": "ISC",
+  "description": "Backend server for crypto streaming"
 }
